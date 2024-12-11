@@ -475,28 +475,18 @@ static int ili_disp_notifier_callback(struct notifier_block *nb,
 					ILI_ERR("TP resume failed\n");
 			}
 			else if (*data == MTK_DISP_BLANK_POWERDOWN) {
-#ifdef ILI_DOUBLE_TAP_CTRL
-				if (ilits->should_enable_gesture) {
+				if (ilits->double_tap_enabled || ilits->single_tap_enabled) {
 					ILI_INFO("TP suspend: tap gesture suspend\n");
 					if (ili_sleep_handler(TP_SUSPEND) < 0)
 						ILI_ERR("TP suspend failed\n");
-#ifdef ILI_SET_TOUCH_STATE
 					touch_set_state(TOUCH_LOW_POWER_STATE, TOUCH_PANEL_IDX_PRIMARY);
-#endif
 				}
 				else {
 					ILI_INFO("TP suspend: TP_DEEP_SLEEP event = %lu\n", value);
 					if (ili_sleep_handler(TP_DEEP_SLEEP) < 0)
 						ILI_ERR("TP suspend deep sleep fail\n");
-#ifdef ILI_SET_TOUCH_STATE
 					touch_set_state(TOUCH_DEEP_SLEEP_STATE, TOUCH_PANEL_IDX_PRIMARY);
-#endif
 				}
-#else //ILI_DOUBLE_TAP_CTRL
-				ILI_INFO("TP suspend: event = %lu, TP_DEEP_SLEEP\n", value);
-				if (ili_sleep_handler(TP_DEEP_SLEEP) < 0)
-					ILI_ERR("TP suspend deep sleep failed\n");
-#endif //ILI_DOUBLE_TAP_CTRL
 			}
 		}
 	}
@@ -631,30 +621,20 @@ static int drm_notifier_callback(struct notifier_block *self, unsigned long even
 		break;
 	case DRM_PANEL_BLANK_POWERDOWN:
 		if (DRM_PANEL_EARLY_EVENT_BLANK == event) {
-#ifdef ILI_DOUBLE_TAP_CTRL
-			if (ilits->should_enable_gesture) {
+			if (ilits->double_tap_enabled || ilits->single_tap_enabled) {
 				ILI_INFO("TP suspend: tap gesture suspend\n");
 				if (ili_sleep_handler(TP_SUSPEND) < 0)
 					ILI_ERR("TP suspend failed\n");
-#ifdef ILI_SET_TOUCH_STATE
 				touch_set_state(TOUCH_LOW_POWER_STATE, TOUCH_PANEL_IDX_PRIMARY);
-#endif
 			}
 			else {
 				ILI_INFO("TP suspend: TP_DEEP_SLEEP event = %lu\n", event);
 				if (ili_sleep_handler(TP_DEEP_SLEEP) < 0)
 					ILI_ERR("TP suspend deep sleep fail\n");
-#ifdef ILI_SET_TOUCH_STATE
 				touch_set_state(TOUCH_DEEP_SLEEP_STATE, TOUCH_PANEL_IDX_PRIMARY);
-#endif
 				if (ilits->rst_pull_flag && gpio_get_value(ilits->tp_rst))
 					gpio_set_value(ilits->tp_rst, 0);
 			}
-#else //ILI_DOUBLE_TAP_CTRL
-			ILI_INFO("TP suspend: event = %lu, TP_DEEP_SLEEP\n", event);
-			if (ili_sleep_handler(TP_DEEP_SLEEP) < 0)
-				ILI_ERR("TP suspend deep sleep failed\n");
-#endif //ILI_DOUBLE_TAP_CTRL
 		} else if (DRM_PANEL_EVENT_BLANK == event) {
 			ILI_INFO("suspend: event = %lu, not care\n", event);
 		}
