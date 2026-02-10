@@ -9,6 +9,10 @@
 #
 # Normal rules (sorted alphabetically)
 #
+
+# KernelSU
+KernelSU/
+
 .*
 *.a
 *.asn1.[ch]
