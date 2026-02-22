@@ -3175,6 +3175,24 @@ static ssize_t gesture_store(struct device *dev,
 
         return count;
 }
+
+static ssize_t double_tap_enabled_show(struct device *dev,
+        struct device_attribute *attr, char *buf)
+{
+        struct chipone_ts_data *cts_data = dev_get_drvdata(dev);
+        return snprintf(buf, PAGE_SIZE, "%u\n", cts_data->d_tap_flag);
+}
+
+static ssize_t double_tap_enabled_store(struct device *dev,
+       struct device_attribute *attr, const char *buf, size_t count)
+{
+        struct chipone_ts_data *cts_data = dev_get_drvdata(dev);
+        cts_lock_device(&cts_data->cts_dev);
+        cts_data->d_tap_flag = (buf[0] != '0');
+        cts_unlock_device(&cts_data->cts_dev);
+        return count;
+}
+
 #endif
 
 #ifdef CTS_STOWED_MODE_EN
@@ -3271,6 +3289,7 @@ static struct device_attribute touchscreen_attributes[] = {
 #endif
 #ifdef CONFIG_BOARD_USES_DOUBLE_TAP_CTRL
         __ATTR_RW(gesture),
+        __ATTR_RW(double_tap_enabled),
 #endif
 #ifdef CTS_STOWED_MODE_EN
     __ATTR_RW(stowed),
